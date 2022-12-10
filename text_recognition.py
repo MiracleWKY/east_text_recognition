@@ -7,7 +7,7 @@ import cv2
 import os
 import time
 import threading
-
+import csv
 import torch
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
@@ -132,7 +132,7 @@ def decode_predictions(scores, geometry):
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", type=str,
 	help="path to input image")
-ap.add_argument("-east", "--east", type=str,
+ap.add_argument("-east", "--east", type=str, default = "frozen_east_text_detection.pb",
 	help="path to input EAST text detector")
 ap.add_argument("-c", "--min-confidence", type=float, default=0.5,
 	help="minimum probability required to inspect a region")
@@ -241,6 +241,8 @@ n.join()
 
 
 '''
+
+
 thread_num = 2
 n = len(dir_list)
 threads = []
@@ -252,6 +254,14 @@ for i in range(thread_num):
 for i in threads:
 	i.join()
 
+
+f = open('east_result.csv', 'w')
+writer = csv.writer(f)
+header = ["filename", "east_decision"]
+writer.writerow(header)
+
+for i in result.keys():
+	writer.writerow([i,result[i]])
 
 
 print(result,len(result))
